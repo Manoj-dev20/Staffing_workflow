@@ -1,0 +1,1004 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Staffing Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0f1117;
+  --surface: #181c27;
+  --surface2: #1e2333;
+  --border: #2a2f45;
+  --border2: #363d58;
+  --accent: #4f8ef7;
+  --accent2: #7c5ef7;
+  --green: #34d399;
+  --red: #f87171;
+  --yellow: #fbbf24;
+  --text: #e8eaf6;
+  --text2: #8892b0;
+  --text3: #4a5568;
+  --radius: 10px;
+  --radius2: 6px;
+  --shadow: 0 4px 24px rgba(0,0,0,0.4);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+
+/* ── SIDEBAR ── */
+.sidebar{position:fixed;top:0;left:0;width:220px;height:100vh;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;z-index:100;padding:0}
+.logo{padding:24px 20px 20px;border-bottom:1px solid var(--border)}
+.logo-mark{display:flex;align-items:center;gap:10px}
+.logo-icon{width:32px;height:32px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px}
+.logo-text{font-size:0.95rem;font-weight:700;color:var(--text);letter-spacing:-0.3px}
+.logo-sub{font-size:0.7rem;color:var(--text2);margin-top:1px}
+nav{padding:16px 12px;flex:1}
+.nav-label{font-size:0.65rem;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:1px;padding:0 8px;margin:16px 0 6px}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:var(--radius2);cursor:pointer;color:var(--text2);font-size:0.875rem;font-weight:500;transition:all 0.15s;margin-bottom:2px;position:relative}
+.nav-item:hover{background:var(--surface2);color:var(--text)}
+.nav-item.active{background:rgba(79,142,247,0.12);color:var(--accent)}
+.nav-item.active::before{content:'';position:absolute;left:-12px;top:50%;transform:translateY(-50%);width:3px;height:20px;background:var(--accent);border-radius:0 3px 3px 0}
+.nav-icon{font-size:1rem;width:20px;text-align:center}
+.nav-badge{margin-left:auto;background:var(--accent);color:white;font-size:0.65rem;font-weight:700;padding:1px 7px;border-radius:20px}
+.sidebar-footer{padding:16px 12px;border-top:1px solid var(--border)}
+.sidebar-footer p{font-size:0.72rem;color:var(--text3);text-align:center}
+
+/* ── MAIN ── */
+.main{margin-left:220px;min-height:100vh;display:flex;flex-direction:column}
+.topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:14px 28px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50}
+.topbar-title{font-size:1rem;font-weight:600;color:var(--text)}
+.topbar-sub{font-size:0.78rem;color:var(--text2);margin-top:1px}
+.topbar-actions{display:flex;align-items:center;gap:10px}
+.content{padding:24px 28px;flex:1}
+
+/* ── BUTTONS ── */
+.btn{display:inline-flex;align-items:center;gap:7px;padding:8px 16px;border-radius:var(--radius2);font-size:0.85rem;font-weight:600;cursor:pointer;border:none;transition:all 0.15s;font-family:inherit}
+.btn-primary{background:var(--accent);color:white}.btn-primary:hover{background:#3d7ef6;transform:translateY(-1px)}
+.btn-secondary{background:var(--surface2);color:var(--text);border:1px solid var(--border2)}.btn-secondary:hover{background:var(--border)}
+.btn-danger{background:rgba(248,113,113,0.15);color:var(--red);border:1px solid rgba(248,113,113,0.3)}.btn-danger:hover{background:rgba(248,113,113,0.25)}
+.btn-success{background:rgba(52,211,153,0.15);color:var(--green);border:1px solid rgba(52,211,153,0.3)}.btn-success:hover{background:rgba(52,211,153,0.25)}
+.btn-sm{padding:5px 11px;font-size:0.78rem}
+.btn:disabled{opacity:0.4;cursor:not-allowed;transform:none!important}
+
+/* ── STATS CARDS ── */
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;position:relative;overflow:hidden}
+.stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px}
+.stat-card.blue::before{background:linear-gradient(90deg,var(--accent),var(--accent2))}
+.stat-card.green::before{background:linear-gradient(90deg,var(--green),#059669)}
+.stat-card.yellow::before{background:linear-gradient(90deg,var(--yellow),#f59e0b)}
+.stat-card.red::before{background:linear-gradient(90deg,var(--red),#ef4444)}
+.stat-num{font-size:2rem;font-weight:700;color:var(--text);font-family:'DM Mono',monospace;margin-bottom:4px}
+.stat-label{font-size:0.78rem;color:var(--text2);font-weight:500}
+.stat-icon{position:absolute;top:16px;right:16px;font-size:1.5rem;opacity:0.4}
+
+/* ── TABLE ── */
+.table-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
+.table-header{padding:16px 20px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);gap:12px;flex-wrap:wrap}
+.table-header-left{display:flex;align-items:center;gap:10px}
+.search-box{display:flex;align-items:center;gap:8px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius2);padding:7px 12px;min-width:220px}
+.search-box input{background:none;border:none;outline:none;color:var(--text);font-size:0.85rem;font-family:inherit;width:100%}
+.search-box input::placeholder{color:var(--text3)}
+.filter-select{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius2);padding:7px 12px;color:var(--text2);font-size:0.82rem;font-family:inherit;outline:none;cursor:pointer}
+table{width:100%;border-collapse:collapse}
+thead th{padding:11px 16px;text-align:left;font-size:0.72rem;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px;border-bottom:1px solid var(--border);background:var(--surface2)}
+tbody tr{border-bottom:1px solid var(--border);transition:background 0.1s;cursor:pointer;position:relative}
+tbody tr:last-child{border-bottom:none}
+tbody tr:hover{background:rgba(79,142,247,0.04)}
+tbody tr.selected{background:rgba(79,142,247,0.08)}
+td{padding:12px 16px;font-size:0.85rem;color:var(--text);vertical-align:middle}
+.td-check{width:40px;padding:12px 8px 12px 16px}
+.checkbox{width:16px;height:16px;accent-color:var(--accent);cursor:pointer;opacity:0;transition:opacity 0.15s}
+tbody tr:hover .checkbox,tbody tr.selected .checkbox,.checkbox:checked{opacity:1!important}
+.candidate-name{font-weight:600;color:var(--text);margin-bottom:2px;font-size:0.88rem}
+.candidate-location{font-size:0.75rem;color:var(--text2)}
+.skills-wrap{display:flex;flex-wrap:wrap;gap:4px;max-width:280px}
+.skill-tag{background:rgba(79,142,247,0.12);color:var(--accent);padding:2px 8px;border-radius:20px;font-size:0.72rem;font-weight:500;white-space:nowrap}
+.skill-tag.more{background:var(--surface2);color:var(--text2)}
+.status-badge{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;font-size:0.75rem;font-weight:600}
+.status-badge.available{background:rgba(52,211,153,0.12);color:var(--green)}
+.status-badge.in_process{background:rgba(251,191,36,0.12);color:var(--yellow)}
+.status-badge.reserved{background:rgba(167,139,250,0.12);color:#a78bfa}
+.status-dot{width:6px;height:6px;border-radius:50%;background:currentColor}
+.price{font-family:'DM Mono',monospace;font-size:0.82rem;color:var(--text)}
+.exp{font-family:'DM Mono',monospace;font-size:0.82rem}
+.row-actions{display:flex;gap:6px;opacity:0;transition:opacity 0.15s}
+tbody tr:hover .row-actions{opacity:1}
+.empty-state{padding:60px 20px;text-align:center;color:var(--text2)}
+.empty-icon{font-size:3rem;margin-bottom:12px;opacity:0.4}
+.empty-text{font-size:0.95rem;margin-bottom:6px}
+.empty-sub{font-size:0.82rem;color:var(--text3)}
+.pagination{padding:14px 20px;display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--border)}
+.pagination-info{font-size:0.8rem;color:var(--text2)}
+.pagination-btns{display:flex;gap:6px}
+.pg-btn{background:var(--surface2);border:1px solid var(--border);color:var(--text2);padding:5px 12px;border-radius:var(--radius2);font-size:0.8rem;cursor:pointer;font-family:inherit;transition:all 0.15s}
+.pg-btn:hover:not(:disabled){background:var(--border);color:var(--text)}
+.pg-btn:disabled{opacity:0.3;cursor:not-allowed}
+.pg-btn.active{background:var(--accent);color:white;border-color:var(--accent)}
+
+/* ── SLIDE PANEL ── */
+.panel-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:200;opacity:0;pointer-events:none;transition:opacity 0.25s;backdrop-filter:blur(2px)}
+.panel-overlay.open{opacity:1;pointer-events:all}
+.panel{position:fixed;top:0;right:0;width:520px;height:100vh;background:var(--surface);border-left:1px solid var(--border);z-index:201;transform:translateX(100%);transition:transform 0.3s cubic-bezier(0.4,0,0.2,1);display:flex;flex-direction:column;overflow:hidden}
+.panel.open{transform:translateX(0)}
+.panel-head{padding:20px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.panel-title{font-size:1rem;font-weight:700;color:var(--text)}
+.panel-close{background:var(--surface2);border:1px solid var(--border);color:var(--text2);width:32px;height:32px;border-radius:var(--radius2);cursor:pointer;font-size:1.1rem;display:flex;align-items:center;justify-content:center;transition:all 0.15s}
+.panel-close:hover{background:var(--border);color:var(--text)}
+.panel-body{flex:1;overflow-y:auto;padding:20px 24px}
+.panel-body::-webkit-scrollbar{width:4px}
+.panel-body::-webkit-scrollbar-track{background:transparent}
+.panel-body::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px}
+.panel-foot{padding:16px 24px;border-top:1px solid var(--border);display:flex;gap:10px;flex-shrink:0}
+
+/* ── FORM ── */
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.form-group{display:flex;flex-direction:column;gap:6px}
+.form-group.full{grid-column:1/-1}
+label{font-size:0.78rem;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:0.4px}
+input[type=text],input[type=number],input[type=url],input[type=email],select,textarea{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius2);padding:9px 12px;color:var(--text);font-size:0.875rem;font-family:inherit;outline:none;width:100%;transition:border-color 0.15s}
+input:focus,select:focus,textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(79,142,247,0.1)}
+input::placeholder,textarea::placeholder{color:var(--text3)}
+select{cursor:pointer}
+select option{background:var(--surface2);color:var(--text)}
+textarea{resize:vertical;min-height:70px}
+
+/* Skills tag input */
+.skills-input-wrap{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius2);padding:7px 10px;display:flex;flex-wrap:wrap;gap:6px;cursor:text;transition:border-color 0.15s;min-height:44px;align-items:flex-start}
+.skills-input-wrap:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px rgba(79,142,247,0.1)}
+.skill-chip{display:flex;align-items:center;gap:5px;background:rgba(79,142,247,0.15);color:var(--accent);padding:3px 10px;border-radius:20px;font-size:0.78rem;font-weight:500}
+.skill-chip-del{cursor:pointer;opacity:0.6;font-size:0.9rem;line-height:1;transition:opacity 0.1s}.skill-chip-del:hover{opacity:1}
+.skills-text-input{background:none;border:none;outline:none;color:var(--text);font-size:0.85rem;font-family:inherit;min-width:100px;padding:2px 4px;flex:1}
+
+/* Currency toggle */
+.currency-toggle{display:flex;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius2);overflow:hidden}
+.currency-opt{flex:1;padding:9px 12px;font-size:0.85rem;font-weight:500;cursor:pointer;text-align:center;transition:all 0.15s;color:var(--text2);border:none;background:none;font-family:inherit}
+.currency-opt.active{background:var(--accent);color:white}
+.price-row{display:flex;gap:8px}
+.price-row input{flex:1}
+
+/* ── TOAST ── */
+.toast-wrap{position:fixed;bottom:24px;right:24px;z-index:999;display:flex;flex-direction:column;gap:8px}
+.toast{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:12px 16px;display:flex;align-items:center;gap:10px;font-size:0.85rem;min-width:280px;box-shadow:var(--shadow);transform:translateX(110%);transition:transform 0.3s cubic-bezier(0.4,0,0.2,1)}
+.toast.show{transform:translateX(0)}
+.toast.success{border-color:rgba(52,211,153,0.4)}.toast.success .toast-icon{color:var(--green)}
+.toast.error{border-color:rgba(248,113,113,0.4)}.toast.error .toast-icon{color:var(--red)}
+.toast-icon{font-size:1rem}
+.toast-msg{flex:1;color:var(--text)}
+
+/* ── CONFIRM MODAL ── */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:300;display:none;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
+.modal-bg.open{display:flex}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:28px;max-width:400px;width:90%;box-shadow:var(--shadow)}
+.modal h3{font-size:1rem;font-weight:700;margin-bottom:8px;color:var(--text)}
+.modal p{font-size:0.875rem;color:var(--text2);line-height:1.6;margin-bottom:20px}
+.modal-actions{display:flex;gap:10px;justify-content:flex-end}
+
+/* ── TABS ── */
+.tab-content{display:none}.tab-content.active{display:block}
+
+/* ── CLIENTS ── */
+.clients-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px}
+.client-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;transition:border-color 0.15s;position:relative}
+.client-card:hover{border-color:var(--border2)}
+.client-card.inactive{opacity:0.5}
+.client-avatar{width:42px;height:42px;border-radius:10px;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-size:1.1rem;font-weight:700;color:white;margin-bottom:12px}
+.client-name{font-weight:700;font-size:0.95rem;margin-bottom:2px}
+.client-company{font-size:0.8rem;color:var(--text2);margin-bottom:6px}
+.client-email{font-size:0.78rem;color:var(--text3);font-family:'DM Mono',monospace}
+.client-actions{display:flex;gap:8px;margin-top:14px}
+.active-pill{position:absolute;top:16px;right:16px;font-size:0.7rem;padding:2px 8px;border-radius:20px;font-weight:600}
+.active-pill.yes{background:rgba(52,211,153,0.12);color:var(--green)}
+.active-pill.no{background:rgba(248,113,113,0.12);color:var(--red)}
+
+/* ── LOADING ── */
+.loader{display:inline-block;width:16px;height:16px;border:2px solid rgba(255,255,255,0.3);border-top-color:white;border-radius:50%;animation:spin 0.7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.skeleton{background:linear-gradient(90deg,var(--surface2) 25%,var(--border) 50%,var(--surface2) 75%);background-size:200% 100%;animation:shimmer 1.2s infinite;border-radius:4px}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+.skeleton-row td{padding:14px 16px}
+.skel{height:14px;border-radius:4px}
+
+/* ── RESPONSIVE ── */
+@media(max-width:900px){
+  .sidebar{width:60px}.logo-text,.logo-sub,.nav-item span,.nav-label,.nav-badge{display:none}
+  .nav-item{justify-content:center;padding:10px}.nav-icon{width:auto}
+  .main{margin-left:60px}.stats-grid{grid-template-columns:1fr 1fr}
+  .panel{width:100%}
+}
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="logo">
+    <div class="logo-mark">
+      <div class="logo-icon">🎯</div>
+      <div>
+        <div class="logo-text">StaffBoard</div>
+        <div class="logo-sub">Staffing Dashboard</div>
+      </div>
+    </div>
+  </div>
+  <nav>
+    <div class="nav-label">Main</div>
+    <div class="nav-item active" onclick="switchTab('candidates')">
+      <span class="nav-icon">👥</span>
+      <span>Candidates</span>
+      <span class="nav-badge" id="badge-candidates">—</span>
+    </div>
+    <div class="nav-item" onclick="switchTab('clients')">
+      <span class="nav-icon">🏢</span>
+      <span>Clients</span>
+      <span class="nav-badge" id="badge-clients">—</span>
+    </div>
+    <div class="nav-label">Overview</div>
+    <div class="nav-item" onclick="switchTab('stats')">
+      <span class="nav-icon">📊</span>
+      <span>Stats</span>
+    </div>
+  </nav>
+  <div class="sidebar-footer">
+    <p>AI Staffing Platform</p>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="topbar">
+    <div>
+      <div class="topbar-title" id="topbar-title">Candidates</div>
+      <div class="topbar-sub" id="topbar-sub">Manage your bench candidates</div>
+    </div>
+    <div class="topbar-actions">
+      <button class="btn btn-secondary btn-sm" onclick="loadAll()">🔄 Refresh</button>
+      <button class="btn btn-primary btn-sm" id="add-btn" onclick="openAddPanel()">+ Add Candidate</button>
+    </div>
+  </div>
+  <div class="content">
+
+    <!-- CANDIDATES TAB -->
+    <div id="tab-candidates" class="tab-content active">
+      <div class="stats-grid">
+        <div class="stat-card blue"><div class="stat-num" id="s-total">—</div><div class="stat-label">Total Candidates</div><div class="stat-icon">👥</div></div>
+        <div class="stat-card green"><div class="stat-num" id="s-available">—</div><div class="stat-label">Available</div><div class="stat-icon">✅</div></div>
+        <div class="stat-card yellow"><div class="stat-num" id="s-inprocess">—</div><div class="stat-label">In Process</div><div class="stat-icon">⚙️</div></div>
+        <div class="stat-card red"><div class="stat-num" id="s-reserved">—</div><div class="stat-label">Reserved</div><div class="stat-icon">🔒</div></div>
+      </div>
+
+      <div class="table-wrap">
+        <div class="table-header">
+          <div class="table-header-left">
+            <div class="search-box">
+              <span>🔍</span>
+              <input type="text" id="search-input" placeholder="Search name, skills, location..." oninput="filterTable()">
+            </div>
+            <select class="filter-select" id="status-filter" onchange="filterTable()">
+              <option value="">All Status</option>
+              <option value="available">Available</option>
+              <option value="in_process">In Process</option>
+              <option value="reserved">Reserved</option>
+            </select>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center">
+            <span id="selected-count" style="font-size:0.8rem;color:var(--text2);display:none"></span>
+            <button class="btn btn-danger btn-sm" id="delete-selected-btn" style="display:none" onclick="confirmDeleteSelected()">🗑 Delete Selected</button>
+          </div>
+        </div>
+        <div style="overflow-x:auto">
+          <table>
+            <thead>
+              <tr>
+                <th class="td-check"><input type="checkbox" class="checkbox" id="select-all" style="opacity:1" onchange="toggleSelectAll(this)"></th>
+                <th>Candidate</th>
+                <th>Skills</th>
+                <th>Exp</th>
+                <th>Rate</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="candidates-tbody">
+              <tr class="skeleton-row"><td></td><td><div class="skel skeleton" style="width:140px;height:14px"></div></td><td><div class="skel skeleton" style="width:200px;height:14px"></div></td><td><div class="skel skeleton" style="width:40px;height:14px"></div></td><td><div class="skel skeleton" style="width:60px;height:14px"></div></td><td><div class="skel skeleton" style="width:80px;height:14px"></div></td><td></td></tr>
+              <tr class="skeleton-row"><td></td><td><div class="skel skeleton" style="width:120px;height:14px"></div></td><td><div class="skel skeleton" style="width:180px;height:14px"></div></td><td><div class="skel skeleton" style="width:40px;height:14px"></div></td><td><div class="skel skeleton" style="width:60px;height:14px"></div></td><td><div class="skel skeleton" style="width:80px;height:14px"></div></td><td></td></tr>
+              <tr class="skeleton-row"><td></td><td><div class="skel skeleton" style="width:160px;height:14px"></div></td><td><div class="skel skeleton" style="width:220px;height:14px"></div></td><td><div class="skel skeleton" style="width:40px;height:14px"></div></td><td><div class="skel skeleton" style="width:60px;height:14px"></div></td><td><div class="skel skeleton" style="width:80px;height:14px"></div></td><td></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="pagination">
+          <span class="pagination-info" id="pagination-info">Loading...</span>
+          <div class="pagination-btns" id="pagination-btns"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CLIENTS TAB -->
+    <div id="tab-clients" class="tab-content">
+      <div style="display:flex;justify-content:flex-end;margin-bottom:16px">
+        <button class="btn btn-primary btn-sm" onclick="openAddClientPanel()">+ Add Client</button>
+      </div>
+      <div class="clients-grid" id="clients-grid">
+        <div style="color:var(--text2);font-size:0.9rem;padding:40px;text-align:center;grid-column:1/-1">Loading clients...</div>
+      </div>
+    </div>
+
+    <!-- STATS TAB -->
+    <div id="tab-stats" class="tab-content">
+      <div class="stats-grid" style="grid-template-columns:repeat(2,1fr);max-width:600px">
+        <div class="stat-card blue"><div class="stat-num" id="st-total">—</div><div class="stat-label">Total Candidates</div><div class="stat-icon">👥</div></div>
+        <div class="stat-card green"><div class="stat-num" id="st-available">—</div><div class="stat-label">Available Now</div><div class="stat-icon">✅</div></div>
+        <div class="stat-card yellow"><div class="stat-num" id="st-inprocess">—</div><div class="stat-label">In Process</div><div class="stat-icon">⚙️</div></div>
+        <div class="stat-card red"><div class="stat-num" id="st-clients">—</div><div class="stat-label">Active Clients</div><div class="stat-icon">🏢</div></div>
+      </div>
+      <div style="margin-top:24px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px;max-width:600px">
+        <h3 style="font-size:0.9rem;color:var(--text2);margin-bottom:16px;text-transform:uppercase;letter-spacing:0.5px">Skills Distribution</h3>
+        <div id="skills-dist" style="display:flex;flex-direction:column;gap:10px"></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- CANDIDATE PANEL -->
+<div class="panel-overlay" id="panel-overlay" onclick="closePanel()"></div>
+<div class="panel" id="candidate-panel">
+  <div class="panel-head">
+    <div class="panel-title" id="panel-title">Add Candidate</div>
+    <button class="panel-close" onclick="closePanel()">✕</button>
+  </div>
+  <div class="panel-body">
+    <div class="form-grid">
+      <div class="form-group full">
+        <label>Full Name *</label>
+        <input type="text" id="f-name" placeholder="e.g. Arjun Mehta">
+      </div>
+      <div class="form-group">
+        <label>Status</label>
+        <select id="f-status">
+          <option value="available">Available</option>
+          <option value="in_process">In Process</option>
+          <option value="reserved">Reserved</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Experience (years)</label>
+        <input type="number" id="f-exp" placeholder="e.g. 5" min="0" max="50" step="0.5">
+      </div>
+      <div class="form-group full">
+        <label>Skills * (press Enter or comma to add)</label>
+        <div class="skills-input-wrap" id="skills-wrap" onclick="focusSkillInput()">
+          <input class="skills-text-input" id="skills-text" placeholder="Type a skill and press Enter..." onkeydown="handleSkillKey(event)" oninput="handleSkillInput(event)">
+        </div>
+      </div>
+      <div class="form-group full">
+        <label>Rate *</label>
+        <div style="display:flex;gap:10px;align-items:center">
+          <div class="currency-toggle">
+            <button class="currency-opt active" id="curr-inr" onclick="setCurrency('INR')">₹ INR</button>
+            <button class="currency-opt" id="curr-usd" onclick="setCurrency('USD')">$ USD</button>
+          </div>
+          <input type="number" id="f-rate" placeholder="per hour" min="0" style="flex:1">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Current Location</label>
+        <input type="text" id="f-location" placeholder="e.g. Bangalore, India">
+      </div>
+      <div class="form-group">
+        <label>Preferred Location</label>
+        <input type="text" id="f-preferred" placeholder="e.g. Remote, Bangalore">
+      </div>
+      <div class="form-group">
+        <label>Willing to Relocate</label>
+        <select id="f-relocate">
+          <option value="true">Yes</option>
+          <option value="false">No</option>
+        </select>
+      </div>
+      <div class="form-group full">
+        <label>Google Drive Resume Link</label>
+        <input type="url" id="f-resume" placeholder="https://drive.google.com/...">
+      </div>
+    </div>
+    <input type="hidden" id="f-id">
+    <input type="hidden" id="f-currency" value="INR">
+  </div>
+  <div class="panel-foot">
+    <button class="btn btn-primary" id="save-btn" onclick="saveCandidate()">💾 Save Candidate</button>
+    <button class="btn btn-secondary" onclick="closePanel()">Cancel</button>
+  </div>
+</div>
+
+<!-- CLIENT PANEL -->
+<div class="panel" id="client-panel" style="z-index:202">
+  <div class="panel-head">
+    <div class="panel-title" id="client-panel-title">Add Client</div>
+    <button class="panel-close" onclick="closeClientPanel()">✕</button>
+  </div>
+  <div class="panel-body">
+    <div class="form-grid">
+      <div class="form-group full"><label>Full Name *</label><input type="text" id="cf-name" placeholder="e.g. Anil Verma"></div>
+      <div class="form-group full"><label>Email *</label><input type="email" id="cf-email" placeholder="e.g. anil@company.com"></div>
+      <div class="form-group full"><label>Company</label><input type="text" id="cf-company" placeholder="e.g. TechCorp"></div>
+      <div class="form-group"><label>Active</label><select id="cf-active"><option value="true">Yes</option><option value="false">No</option></select></div>
+    </div>
+    <input type="hidden" id="cf-id">
+  </div>
+  <div class="panel-foot">
+    <button class="btn btn-primary" onclick="saveClient()">💾 Save Client</button>
+    <button class="btn btn-secondary" onclick="closeClientPanel()">Cancel</button>
+  </div>
+</div>
+
+<!-- DELETE MODAL -->
+<div class="modal-bg" id="delete-modal">
+  <div class="modal">
+    <h3>🗑 Confirm Delete</h3>
+    <p id="delete-modal-msg">Are you sure? This cannot be undone.</p>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="closeDeleteModal()">Cancel</button>
+      <button class="btn btn-danger" id="confirm-delete-btn" onclick="executeDelete()">Delete</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOASTS -->
+<div class="toast-wrap" id="toast-wrap"></div>
+
+<script>
+// ── CONFIG ────────────────────────────────────────────────────────────
+const SB_URL = 'https://atryeqodlknrvkpbgzjq.supabase.co';
+const SB_KEY = 'sb_publishable_zE0AfHGlrj8K72L2genhkQ_fMPc5B5R';
+
+const headers = {
+  'apikey': SB_KEY,
+  'Authorization': `Bearer ${SB_KEY}`,
+  'Content-Type': 'application/json',
+  'Prefer': 'return=representation'
+};
+
+// ── STATE ─────────────────────────────────────────────────────────────
+let allCandidates = [];
+let filteredCandidates = [];
+let selectedIds = new Set();
+let currentPage = 1;
+const PAGE_SIZE = 10;
+let currentSkills = [];
+let currentCurrency = 'INR';
+let deleteTarget = null;
+let deleteType = null;
+
+// ── API ───────────────────────────────────────────────────────────────
+async function api(path, method='GET', body=null) {
+  const opts = { method, headers };
+  if (body) opts.body = JSON.stringify(body);
+  const res = await fetch(SB_URL + path, opts);
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error(err);
+  }
+  if (res.status === 204) return null;
+  return res.json();
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────
+async function loadAll() {
+  await Promise.all([loadCandidates(), loadClients()]);
+}
+
+async function loadCandidates() {
+  try {
+    const data = await api('/rest/v1/candidates_main?select=*&order=created_at.desc');
+    allCandidates = data || [];
+    filteredCandidates = [...allCandidates];
+    currentPage = 1;
+    selectedIds.clear();
+    renderTable();
+    updateStats();
+    updateBadge('candidates', allCandidates.length);
+  } catch(e) {
+    toast('Failed to load candidates: ' + e.message, 'error');
+  }
+}
+
+async function loadClients() {
+  try {
+    const data = await api('/rest/v1/clients?select=*&order=created_at.desc');
+    renderClients(data || []);
+    updateBadge('clients', (data||[]).filter(c=>c.is_active).length);
+    updateStatNumbers(data||[]);
+  } catch(e) {
+    toast('Failed to load clients: ' + e.message, 'error');
+  }
+}
+
+// ── STATS ─────────────────────────────────────────────────────────────
+function updateStats() {
+  const total = allCandidates.length;
+  const available = allCandidates.filter(c=>c.user_status==='available').length;
+  const inprocess = allCandidates.filter(c=>c.user_status==='in_process').length;
+  const reserved = allCandidates.filter(c=>c.user_status==='reserved').length;
+  ['s-total','st-total'].forEach(id=>{ const el=document.getElementById(id); if(el) el.textContent=total; });
+  ['s-available','st-available'].forEach(id=>{ const el=document.getElementById(id); if(el) el.textContent=available; });
+  ['s-inprocess','st-inprocess'].forEach(id=>{ const el=document.getElementById(id); if(el) el.textContent=inprocess; });
+  document.getElementById('s-reserved').textContent = reserved;
+  renderSkillsDist();
+}
+
+function updateStatNumbers(clients) {
+  const active = clients.filter(c=>c.is_active).length;
+  const el = document.getElementById('st-clients');
+  if(el) el.textContent = active;
+}
+
+function renderSkillsDist() {
+  const skillCount = {};
+  allCandidates.forEach(c => {
+    const skills = parseSkills(c.skills);
+    skills.forEach(s => { skillCount[s] = (skillCount[s]||0)+1; });
+  });
+  const sorted = Object.entries(skillCount).sort((a,b)=>b[1]-a[1]).slice(0,10);
+  const max = sorted[0]?.[1] || 1;
+  const el = document.getElementById('skills-dist');
+  if (!el) return;
+  el.innerHTML = sorted.map(([skill, count]) => `
+    <div style="display:flex;align-items:center;gap:10px">
+      <span style="font-size:0.82rem;color:var(--text2);width:100px;flex-shrink:0;text-align:right">${skill}</span>
+      <div style="flex:1;background:var(--surface2);border-radius:4px;height:8px;overflow:hidden">
+        <div style="background:linear-gradient(90deg,var(--accent),var(--accent2));height:100%;width:${(count/max*100).toFixed(0)}%;border-radius:4px;transition:width 0.5s"></div>
+      </div>
+      <span style="font-size:0.75rem;color:var(--text3);font-family:'DM Mono',monospace;width:20px">${count}</span>
+    </div>
+  `).join('');
+}
+
+// ── TABLE ─────────────────────────────────────────────────────────────
+function parseSkills(skills) {
+  if (!skills) return [];
+  if (Array.isArray(skills)) return skills;
+  if (typeof skills === 'string') return skills.replace(/[{}"]/g,'').split(',').map(s=>s.trim()).filter(Boolean);
+  return [];
+}
+
+function filterTable() {
+  const q = document.getElementById('search-input').value.toLowerCase();
+  const st = document.getElementById('status-filter').value;
+  filteredCandidates = allCandidates.filter(c => {
+    const skills = parseSkills(c.skills).join(' ').toLowerCase();
+    const matchQ = !q || c.name?.toLowerCase().includes(q) || skills.includes(q) || c.current_location?.toLowerCase().includes(q);
+    const matchSt = !st || c.user_status === st;
+    return matchQ && matchSt;
+  });
+  currentPage = 1;
+  renderTable();
+}
+
+function renderTable() {
+  const tbody = document.getElementById('candidates-tbody');
+  const start = (currentPage-1)*PAGE_SIZE;
+  const pageData = filteredCandidates.slice(start, start+PAGE_SIZE);
+
+  if (filteredCandidates.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="7"><div class="empty-state"><div class="empty-icon">🔍</div><div class="empty-text">No candidates found</div><div class="empty-sub">Try adjusting your search or filters</div></div></td></tr>`;
+    updatePagination();
+    return;
+  }
+
+  tbody.innerHTML = pageData.map(c => {
+    const skills = parseSkills(c.skills);
+    const visibleSkills = skills.slice(0,4);
+    const moreCount = skills.length - 4;
+    const skillTags = visibleSkills.map(s=>`<span class="skill-tag">${s}</span>`).join('') + (moreCount>0?`<span class="skill-tag more">+${moreCount}</span>`:'');
+    const statusMap = {available:'available',in_process:'in_process',reserved:'reserved'};
+    const statusLabel = {available:'Available',in_process:'In Process',reserved:'Reserved'};
+    const st = c.user_status || 'available';
+    const rate = c.per_hour_price ? `₹${Number(c.per_hour_price).toLocaleString()}/hr` : '—';
+    const isSelected = selectedIds.has(c.candidate_id);
+    return `<tr class="${isSelected?'selected':''}" onclick="handleRowClick(event,${c.candidate_id})">
+      <td class="td-check"><input type="checkbox" class="checkbox row-check" data-id="${c.candidate_id}" ${isSelected?'checked':''} onclick="handleCheck(event,${c.candidate_id})"></td>
+      <td><div class="candidate-name">${c.name}</div><div class="candidate-location">📍 ${c.current_location||'—'}</div></td>
+      <td><div class="skills-wrap">${skillTags}</div></td>
+      <td><span class="exp">${c.experience||0}y</span></td>
+      <td><span class="price">${rate}</span></td>
+      <td><span class="status-badge ${statusMap[st]}"><span class="status-dot"></span>${statusLabel[st]||st}</span></td>
+      <td><div class="row-actions">
+        <button class="btn btn-secondary btn-sm" onclick="openEditPanel(event,${c.candidate_id})">✏️ Edit</button>
+        <button class="btn btn-danger btn-sm" onclick="confirmDeleteOne(event,${c.candidate_id})">🗑</button>
+      </div></td>
+    </tr>`;
+  }).join('');
+
+  updatePagination();
+  updateSelectionUI();
+}
+
+function handleRowClick(e, id) {
+  if (e.target.tagName==='BUTTON'||e.target.tagName==='INPUT') return;
+  const cb = document.querySelector(`.row-check[data-id="${id}"]`);
+  if(cb) { cb.checked=!cb.checked; handleCheck({stopPropagation:()=>{}},id); }
+}
+
+function handleCheck(e, id) {
+  e.stopPropagation();
+  if (selectedIds.has(id)) selectedIds.delete(id);
+  else selectedIds.add(id);
+  document.querySelector(`.row-check[data-id="${id}"]`).closest('tr').classList.toggle('selected', selectedIds.has(id));
+  updateSelectionUI();
+}
+
+function toggleSelectAll(cb) {
+  const pageData = filteredCandidates.slice((currentPage-1)*PAGE_SIZE, currentPage*PAGE_SIZE);
+  pageData.forEach(c => {
+    if(cb.checked) selectedIds.add(c.candidate_id);
+    else selectedIds.delete(c.candidate_id);
+  });
+  renderTable();
+}
+
+function updateSelectionUI() {
+  const count = selectedIds.size;
+  const countEl = document.getElementById('selected-count');
+  const deleteBtn = document.getElementById('delete-selected-btn');
+  if(count>0) {
+    countEl.style.display='inline';
+    countEl.textContent=`${count} selected`;
+    deleteBtn.style.display='inline-flex';
+  } else {
+    countEl.style.display='none';
+    deleteBtn.style.display='none';
+  }
+}
+
+function updatePagination() {
+  const total = filteredCandidates.length;
+  const totalPages = Math.ceil(total/PAGE_SIZE);
+  const start = (currentPage-1)*PAGE_SIZE+1;
+  const end = Math.min(currentPage*PAGE_SIZE, total);
+  document.getElementById('pagination-info').textContent = total===0 ? 'No results' : `Showing ${start}–${end} of ${total}`;
+  const btns = document.getElementById('pagination-btns');
+  btns.innerHTML = '';
+  const prev = document.createElement('button');
+  prev.className='pg-btn'; prev.textContent='← Prev'; prev.disabled=currentPage===1;
+  prev.onclick=()=>{ currentPage--; renderTable(); };
+  btns.appendChild(prev);
+  for(let i=Math.max(1,currentPage-1); i<=Math.min(totalPages,currentPage+1); i++) {
+    const b = document.createElement('button');
+    b.className='pg-btn'+(i===currentPage?' active':'');
+    b.textContent=i; b.onclick=(()=>{const p=i;return()=>{currentPage=p;renderTable();};})();
+    btns.appendChild(b);
+  }
+  const next = document.createElement('button');
+  next.className='pg-btn'; next.textContent='Next →'; next.disabled=currentPage>=totalPages;
+  next.onclick=()=>{ currentPage++; renderTable(); };
+  btns.appendChild(next);
+}
+
+// ── PANEL ─────────────────────────────────────────────────────────────
+function openAddPanel() {
+  document.getElementById('panel-title').textContent='Add Candidate';
+  document.getElementById('f-id').value='';
+  document.getElementById('f-name').value='';
+  document.getElementById('f-status').value='available';
+  document.getElementById('f-exp').value='';
+  document.getElementById('f-rate').value='';
+  document.getElementById('f-location').value='';
+  document.getElementById('f-preferred').value='';
+  document.getElementById('f-relocate').value='true';
+  document.getElementById('f-resume').value='';
+  currentSkills=[];
+  setCurrency('INR');
+  renderSkillChips();
+  document.getElementById('panel-overlay').classList.add('open');
+  document.getElementById('candidate-panel').classList.add('open');
+  setTimeout(()=>document.getElementById('f-name').focus(), 300);
+}
+
+function openEditPanel(e, id) {
+  e.stopPropagation();
+  const c = allCandidates.find(x=>x.candidate_id===id);
+  if(!c) return;
+  document.getElementById('panel-title').textContent='Edit Candidate';
+  document.getElementById('f-id').value=c.candidate_id;
+  document.getElementById('f-name').value=c.name||'';
+  document.getElementById('f-status').value=c.user_status||'available';
+  document.getElementById('f-exp').value=c.experience||'';
+  document.getElementById('f-location').value=c.current_location||'';
+  document.getElementById('f-preferred').value=c.preferred_location||'';
+  document.getElementById('f-relocate').value=c.willing_to_relocate?'true':'false';
+  document.getElementById('f-resume').value=c.resume_drive_link||'';
+  currentSkills=parseSkills(c.skills);
+  // Detect currency from price (simple heuristic)
+  const price = Number(c.per_hour_price)||0;
+  const curr = price > 500 ? 'INR' : 'USD';
+  setCurrency(curr);
+  document.getElementById('f-rate').value=price||'';
+  renderSkillChips();
+  document.getElementById('panel-overlay').classList.add('open');
+  document.getElementById('candidate-panel').classList.add('open');
+}
+
+function closePanel() {
+  document.getElementById('panel-overlay').classList.remove('open');
+  document.getElementById('candidate-panel').classList.remove('open');
+}
+
+async function saveCandidate() {
+  const id = document.getElementById('f-id').value;
+  const name = document.getElementById('f-name').value.trim();
+  if(!name) { toast('Name is required','error'); return; }
+  if(currentSkills.length===0) { toast('Add at least one skill','error'); return; }
+  const rate = document.getElementById('f-rate').value;
+  if(!rate) { toast('Rate is required','error'); return; }
+
+  const payload = {
+    name,
+    user_status: document.getElementById('f-status').value,
+    experience: parseFloat(document.getElementById('f-exp').value)||0,
+    skills: currentSkills,
+    per_hour_price: parseFloat(rate),
+    current_location: document.getElementById('f-location').value.trim(),
+    preferred_location: document.getElementById('f-preferred').value.trim(),
+    willing_to_relocate: document.getElementById('f-relocate').value==='true',
+    resume_drive_link: document.getElementById('f-resume').value.trim()||null,
+    updated_at: new Date().toISOString()
+  };
+
+  const btn = document.getElementById('save-btn');
+  btn.innerHTML='<span class="loader"></span> Saving...';
+  btn.disabled=true;
+
+  try {
+    if(id) {
+      await api(`/rest/v1/candidates_main?candidate_id=eq.${id}`, 'PATCH', payload);
+      toast('Candidate updated ✅','success');
+    } else {
+      payload.created_at = new Date().toISOString();
+      await api('/rest/v1/candidates_main', 'POST', payload);
+      toast('Candidate added ✅','success');
+    }
+    closePanel();
+    await loadCandidates();
+  } catch(e) {
+    toast('Error: '+e.message,'error');
+  } finally {
+    btn.innerHTML='💾 Save Candidate';
+    btn.disabled=false;
+  }
+}
+
+// ── SKILLS INPUT ──────────────────────────────────────────────────────
+function focusSkillInput() { document.getElementById('skills-text').focus(); }
+
+function handleSkillKey(e) {
+  if(e.key==='Enter'||e.key===',') {
+    e.preventDefault();
+    addSkillFromInput();
+  } else if(e.key==='Backspace' && e.target.value==='' && currentSkills.length>0) {
+    currentSkills.pop();
+    renderSkillChips();
+  }
+}
+
+function handleSkillInput(e) {
+  if(e.target.value.includes(',')) addSkillFromInput();
+}
+
+function addSkillFromInput() {
+  const val = document.getElementById('skills-text').value.replace(',','').trim();
+  if(val && !currentSkills.includes(val)) {
+    currentSkills.push(val);
+    renderSkillChips();
+  }
+  document.getElementById('skills-text').value='';
+}
+
+function removeSkill(skill) {
+  currentSkills = currentSkills.filter(s=>s!==skill);
+  renderSkillChips();
+}
+
+function renderSkillChips() {
+  const wrap = document.getElementById('skills-wrap');
+  const input = document.getElementById('skills-text');
+  wrap.innerHTML='';
+  currentSkills.forEach(s => {
+    const chip = document.createElement('span');
+    chip.className='skill-chip';
+    chip.innerHTML=`${s}<span class="skill-chip-del" onclick="removeSkill('${s}')">✕</span>`;
+    wrap.appendChild(chip);
+  });
+  wrap.appendChild(input);
+}
+
+// ── CURRENCY ──────────────────────────────────────────────────────────
+function setCurrency(curr) {
+  currentCurrency=curr;
+  document.getElementById('curr-inr').classList.toggle('active',curr==='INR');
+  document.getElementById('curr-usd').classList.toggle('active',curr==='USD');
+  document.getElementById('f-currency').value=curr;
+  document.getElementById('f-rate').placeholder=curr==='INR'?'₹ per hour':'$ per hour';
+}
+
+// ── DELETE ────────────────────────────────────────────────────────────
+function confirmDeleteOne(e, id) {
+  e.stopPropagation();
+  const c = allCandidates.find(x=>x.candidate_id===id);
+  deleteTarget=[id]; deleteType='candidate';
+  document.getElementById('delete-modal-msg').textContent=`Delete "${c?.name}"? This cannot be undone.`;
+  document.getElementById('delete-modal').classList.add('open');
+}
+
+function confirmDeleteSelected() {
+  if(selectedIds.size===0) return;
+  deleteTarget=[...selectedIds]; deleteType='candidate';
+  document.getElementById('delete-modal-msg').textContent=`Delete ${selectedIds.size} selected candidate(s)? This cannot be undone.`;
+  document.getElementById('delete-modal').classList.add('open');
+}
+
+function closeDeleteModal() {
+  document.getElementById('delete-modal').classList.remove('open');
+  deleteTarget=null; deleteType=null;
+}
+
+async function executeDelete() {
+  if(!deleteTarget) return;
+  const btn=document.getElementById('confirm-delete-btn');
+  btn.innerHTML='<span class="loader"></span>';
+  btn.disabled=true;
+  try {
+    if(deleteType==='candidate') {
+      for(const id of deleteTarget) {
+        await api(`/rest/v1/candidates_main?candidate_id=eq.${id}`,'DELETE');
+      }
+      toast(`Deleted ${deleteTarget.length} candidate(s) ✅`,'success');
+      selectedIds.clear();
+      await loadCandidates();
+    } else if(deleteType==='client') {
+      await api(`/rest/v1/clients?client_id=eq.${deleteTarget[0]}`,'DELETE');
+      toast('Client deleted ✅','success');
+      await loadClients();
+    }
+    closeDeleteModal();
+  } catch(e) {
+    toast('Error: '+e.message,'error');
+  } finally {
+    btn.innerHTML='Delete'; btn.disabled=false;
+  }
+}
+
+// ── CLIENTS ───────────────────────────────────────────────────────────
+function renderClients(clients) {
+  const grid = document.getElementById('clients-grid');
+  if(!clients.length) {
+    grid.innerHTML='<div style="color:var(--text2);padding:40px;text-align:center;grid-column:1/-1">No clients yet. Add your first client!</div>';
+    return;
+  }
+  grid.innerHTML = clients.map(c => {
+    const initials = c.name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+    return `<div class="client-card ${c.is_active?'':'inactive'}">
+      <span class="active-pill ${c.is_active?'yes':'no'}">${c.is_active?'Active':'Inactive'}</span>
+      <div class="client-avatar">${initials}</div>
+      <div class="client-name">${c.name}</div>
+      <div class="client-company">🏢 ${c.company||'—'}</div>
+      <div class="client-email">${c.email}</div>
+      <div class="client-actions">
+        <button class="btn btn-secondary btn-sm" onclick="openEditClientPanel(${c.client_id})">✏️ Edit</button>
+        <button class="btn btn-danger btn-sm" onclick="confirmDeleteClient(${c.client_id},'${c.name}')">🗑</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function openAddClientPanel() {
+  document.getElementById('client-panel-title').textContent='Add Client';
+  document.getElementById('cf-id').value='';
+  document.getElementById('cf-name').value='';
+  document.getElementById('cf-email').value='';
+  document.getElementById('cf-company').value='';
+  document.getElementById('cf-active').value='true';
+  document.getElementById('panel-overlay').classList.add('open');
+  document.getElementById('client-panel').classList.add('open');
+}
+
+function openEditClientPanel(id) {
+  const clients = document.querySelectorAll('.client-card');
+  // re-fetch from API for accuracy
+  api(`/rest/v1/clients?client_id=eq.${id}&select=*`).then(data => {
+    if(!data||!data[0]) return;
+    const c = data[0];
+    document.getElementById('client-panel-title').textContent='Edit Client';
+    document.getElementById('cf-id').value=c.client_id;
+    document.getElementById('cf-name').value=c.name||'';
+    document.getElementById('cf-email').value=c.email||'';
+    document.getElementById('cf-company').value=c.company||'';
+    document.getElementById('cf-active').value=c.is_active?'true':'false';
+    document.getElementById('panel-overlay').classList.add('open');
+    document.getElementById('client-panel').classList.add('open');
+  });
+}
+
+function closeClientPanel() {
+  document.getElementById('panel-overlay').classList.remove('open');
+  document.getElementById('client-panel').classList.remove('open');
+}
+
+async function saveClient() {
+  const id = document.getElementById('cf-id').value;
+  const name = document.getElementById('cf-name').value.trim();
+  const email = document.getElementById('cf-email').value.trim();
+  if(!name||!email) { toast('Name and email are required','error'); return; }
+  const payload = {
+    name, email,
+    company: document.getElementById('cf-company').value.trim()||null,
+    is_active: document.getElementById('cf-active').value==='true'
+  };
+  try {
+    if(id) {
+      await api(`/rest/v1/clients?client_id=eq.${id}`,'PATCH',payload);
+      toast('Client updated ✅','success');
+    } else {
+      await api('/rest/v1/clients','POST',payload);
+      toast('Client added ✅','success');
+    }
+    closeClientPanel();
+    await loadClients();
+  } catch(e) {
+    toast('Error: '+e.message,'error');
+  }
+}
+
+function confirmDeleteClient(id, name) {
+  deleteTarget=[id]; deleteType='client';
+  document.getElementById('delete-modal-msg').textContent=`Delete client "${name}"? This cannot be undone.`;
+  document.getElementById('delete-modal').classList.add('open');
+}
+
+// ── TABS ──────────────────────────────────────────────────────────────
+function switchTab(tab) {
+  document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('tab-'+tab).classList.add('active');
+  event.currentTarget.classList.add('active');
+  const titles = {candidates:['Candidates','Manage your bench candidates'],clients:['Clients','Manage broadcast clients'],stats:['Overview','Platform statistics']};
+  const [title,sub]=titles[tab]||['Dashboard',''];
+  document.getElementById('topbar-title').textContent=title;
+  document.getElementById('topbar-sub').textContent=sub;
+  const addBtn=document.getElementById('add-btn');
+  if(tab==='candidates'){addBtn.style.display='inline-flex';addBtn.textContent='+ Add Candidate';addBtn.onclick=openAddPanel;}
+  else if(tab==='clients'){addBtn.style.display='inline-flex';addBtn.textContent='+ Add Client';addBtn.onclick=openAddClientPanel;}
+  else {addBtn.style.display='none';}
+  if(tab==='stats') renderSkillsDist();
+}
+
+// ── BADGE ─────────────────────────────────────────────────────────────
+function updateBadge(tab, count) {
+  const el=document.getElementById('badge-'+tab);
+  if(el) el.textContent=count;
+}
+
+// ── TOAST ─────────────────────────────────────────────────────────────
+function toast(msg, type='success') {
+  const wrap=document.getElementById('toast-wrap');
+  const t=document.createElement('div');
+  t.className=`toast ${type}`;
+  t.innerHTML=`<span class="toast-icon">${type==='success'?'✅':'❌'}</span><span class="toast-msg">${msg}</span>`;
+  wrap.appendChild(t);
+  setTimeout(()=>t.classList.add('show'),10);
+  setTimeout(()=>{ t.classList.remove('show'); setTimeout(()=>t.remove(),300); },3500);
+}
+
+// ── KEYBOARD SHORTCUTS ────────────────────────────────────────────────
+document.addEventListener('keydown', e => {
+  if(e.key==='Escape'){closePanel();closeClientPanel();closeDeleteModal();}
+  if((e.ctrlKey||e.metaKey)&&e.key==='k'){e.preventDefault();document.getElementById('search-input').focus();}
+});
+
+// ── START ─────────────────────────────────────────────────────────────
+loadAll();
+</script>
+</body>
+</html>
