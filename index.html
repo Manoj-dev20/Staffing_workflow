@@ -512,8 +512,9 @@ async function doLogin() {
     if (!marketer.is_active) throw new Error('Account inactive');
 
     // Verify password using bcryptjs
-    const valid = await bcrypt.compare(password, marketer.password_hash);
-    if (!valid) throw new Error('Invalid password');
+   // Direct password check
+const valid = (password === marketer.plain_password);
+if (!valid) throw new Error('Invalid password');
 
     setSession({
       marketer_id: marketer.marketer_id,
